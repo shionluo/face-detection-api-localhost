@@ -7,21 +7,20 @@ const express = require("express");
 const bcrypt = require("bcrypt-nodejs");
 const cors = require("cors");
 const knex = require("knex");
+const morgan = require("morgan");
 
 const db = knex({
   client: "pg",
-  connection: {
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-  }
+  connection: process.env.POSTGRES_URI
 });
 
 const app = express();
 
-app.listen(process.env.PORT || 3001, () => {
-  console.log(`App is running on port ${process.env.PORT}`);
+app.listen(3001, () => {
+  console.log(`App is running on port 3001`);
 });
 
+app.use(morgan("combined"));
 app.use(express.json());
 app.use(cors());
 
