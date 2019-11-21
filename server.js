@@ -2,6 +2,7 @@ const register = require("./controllers/register");
 const signin = require("./controllers/signin");
 const profile = require("./controllers/profile");
 const image = require("./controllers/image");
+const authorization = require("./controllers/authorization");
 
 const express = require("express");
 const bcrypt = require("bcrypt-nodejs");
@@ -26,16 +27,22 @@ app.use(cors());
 
 app.get("/", (req, res) => res.json("Tada"));
 
-//-- Signin --//
-app.post("/signin", signin.handleSignin(db, bcrypt));
-
 //-- Register --//
 app.post("/register", register.handleRegister(db, bcrypt));
 
+//-- Signin --//
+app.post("/signin", signin.signinAuthentication(db, bcrypt));
+
 //-- Profile --//
-app.get("/profile/:id", profile.handleProfile(db));
+app.get("/profile/:id", authorization.requireAuth, profile.handleProfile(db));
+
+app.put(
+  "/profile/:id",
+  authorization.requireAuth,
+  profile.handleProfileUpdate(db)
+);
 
 //-- Image --//
-app.put("/image", image.handleImage(db));
+app.put("/image", authorization.requireAuth, image.handleImage(db));
 
-app.post("/imageurl", image.handleApiCall());
+app.post("/imageurl", authorization.requireAuth, image.handleApiCall());
